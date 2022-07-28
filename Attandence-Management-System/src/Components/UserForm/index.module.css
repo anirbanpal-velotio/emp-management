@@ -1,0 +1,11 @@
+.modal-footer{
+    margin-top: 10px;
+}
+.save{
+    float: right;
+ 
+ }
+ .cancel{
+    float: right;
+    margin-right: 5px;
+}

@@ -1,0 +1,10 @@
+.AttendanceTable{
+    background-color: #00e4e5;
+    min-height: 400px;
+    width: 900px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.title{
+    margin: auto;
+}

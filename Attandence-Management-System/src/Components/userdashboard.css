@@ -1,0 +1,38 @@
+/* center the image with circle in page */
+/* .userlogo{
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    
+
+} */
+img{
+    margin-top: 80px;
+   display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+
+}
+.userdashboard h2{
+    text-align: center;
+    color: #00ffcc;
+}
+
+
+.btn-information{
+    margin-left: 50px;
+    /* height: 200px;
+    width: 200px; */
+    background-color: #00ffcc;
+    border:none;
+    outline: none;
+    color: white;
+    padding: 40px;
+    font-size: 20px;
+}
+.card{
+    width: 18rem;
+}
