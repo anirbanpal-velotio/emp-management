@@ -6,16 +6,17 @@ import cors from 'cors';
 import CookieParser from 'cookie-parser';
 
 import { dbInit } from './models';
-import LoginRouter from './controllers/login'
-import UserRouter from './controllers/user'
+import LoginRouter from './controllers/login';
+import UserRouter from './controllers/user';
+
 const app:Application = express();
 const db = dbInit();
 
-app.use(cors({origin:'http://localhost:3000', credentials: true}));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
-app.use(CookieParser())
-app.use('/auth',LoginRouter );
-app.use('/user', UserRouter)
+app.use(CookieParser());
+app.use('/auth', LoginRouter);
+app.use('/user', UserRouter);
 app.use('*', (req:Request, res:Response) => {
   res.status(404).json({
     success: 'false',
@@ -29,12 +30,12 @@ app.use('*', (req:Request, res:Response) => {
 
 const PORT = process.env.PORT || 8000;
 let server:any;
-db?.sequelize.sync({force: false})
-.then(()=>{
-  server = app.listen(+PORT, '0.0.0.0', () => {
-    console.info(`server started on port ${PORT}`);
+db?.sequelize.sync({ force: false })
+  .then(() => {
+    server = app.listen(+PORT, '0.0.0.0', () => {
+      console.info(`server started on port ${PORT}`);
+    });
   });
-});
 process.on('unhandledRejection', (error:Error) => {
   console.info('common catch block for all unhandledRejection exception');
   console.error(error.message);

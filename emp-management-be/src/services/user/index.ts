@@ -6,38 +6,41 @@ import { ErrorTypes, IDeleteUserParams, IUpdateUserParams } from '../../types/ap
 import { IUserAttributes, UserRole } from '../../types/model';
 
 export default class User {
-
-  public async createUser(params:IUserAttributes):Promise<IUserAttributes>{
-    const {name,email,password,role,age,dateOfJoining} = params;
+  public async createUser(params:IUserAttributes):Promise<IUserAttributes> {
+    const {
+      name, email, password, role, age, dateOfJoining,
+    } = params;
     const hashedResult = await hash(password!, 5);
     const user:IUserAttributes = {
-      name,email,password:hashedResult, role, age,
-      dateOfJoining:moment(dateOfJoining).format("YYYY-MM-DD")
+      name,
+      email,
+      password: hashedResult,
+      role,
+      age,
+      dateOfJoining: moment(dateOfJoining).format('YYYY-MM-DD'),
+    };
+    let userResponse:any = null;
+    try {
+      userResponse = await db.users.create(user, { logging: console.log });
+      userResponse = JSON.parse(JSON.stringify(userResponse));
+    } catch (err:any) {
+      console.error(err.message);
+      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR);
     }
-    let userResponse:any=null
-    try{
-      userResponse = await db.users.create(user,{logging: console.log});
-      userResponse = JSON.parse(JSON.stringify(userResponse))
-    }
-    catch(err:any){
-      console.error(err.message)
-      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR)
-    }
-    user.id = userResponse.id
+    user.id = userResponse.id;
     return user;
   }
-  
+
   public async getUserById(id: number): Promise<IUserAttributes> {
-    let userResponse:any=null
-    try{
+    let userResponse:any = null;
+    try {
       userResponse = await db.users.findOne({
         where: { id },
-        attributes: { exclude: ['password'] }
+        attributes: { exclude: ['password'] },
       });
-    }
-    catch(err:any){
-      console.error(err.message)
-      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR)
+    } catch (err:any) {
+      console.error(err.message);
+      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR);
     }
     if (!userResponse) {
       throw new Error(ErrorTypes.USER_NOT_FOUND);
@@ -47,20 +50,19 @@ export default class User {
   }
 
   public async getUserByEmail(email: string): Promise<IUserAttributes> {
-    let userResponse:any=null
-    try{
+    let userResponse:any = null;
+    try {
       userResponse = await db.users.findOne({
         where: {
           email: {
-            [Op.eq]: email
-          }
+            [Op.eq]: email,
+          },
         },
         // logging:console.log
       });
-    }
-    catch(err:any){
-      console.error(err.message)
-      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR)
+    } catch (err:any) {
+      console.error(err.message);
+      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR);
     }
     if (!userResponse) {
       throw new Error(ErrorTypes.USER_NOT_FOUND);
@@ -71,71 +73,74 @@ export default class User {
 
   public async getAllUsers(): Promise<IUserAttributes[]> {
     const userResponse = await db.users.findAll({
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
     });
     const users = JSON.parse(JSON.stringify(userResponse)) as IUserAttributes[];
-    return users
+    return users;
   }
 
   public async editUser(params: IUpdateUserParams): Promise<IUserAttributes> {
-    const { id, name, role, email, password, age, dateOfJoining, requestedUserId } = params;
+    const {
+      id, name, role, email, password, age, dateOfJoining, requestedUserId,
+    } = params;
     const updatedUser: IUserAttributes = {
-      ...(age && {age}),
-      ...(dateOfJoining && {dateOfJoining: moment(dateOfJoining).format("YYYY-MM-DD")}),
-      ...(role && {role}),
-      ...(email &&{email}),
-      ...(name && {name})
-    }
-    if(password){
+      ...(age && { age }),
+      ...(dateOfJoining && { dateOfJoining: moment(dateOfJoining).format('YYYY-MM-DD') }),
+      ...(role && { role }),
+      ...(email && { email }),
+      ...(name && { name }),
+    };
+    if (password) {
       const hashedResult = await hash(password!, 5);
-      updatedUser.password = hashedResult
+      updatedUser.password = hashedResult;
     }
-    
+
     let result:any = null;
-    try{
+    try {
       result = await db.users.update(
-        {...updatedUser},
+        { ...updatedUser },
         {
-          where:{
-            [Op.and]:[{id},{role:{
-              [Op.ne]:UserRole.ADMIN
-            }}]
+          where: {
+            [Op.and]: [{ id }, {
+              role: {
+                [Op.ne]: UserRole.ADMIN,
+              },
+            }],
           },
-          logging: console.log
+          logging: console.log,
         },
-      )
-    }
-    catch(err:any){
-      console.error(err.message)
-      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR)
+      );
+    } catch (err:any) {
+      console.error(err.message);
+      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR);
     }
     if (Array.isArray(result) && result.length > 0 && result[0] > 0) {
       updatedUser.id = id;
-      if(updatedUser.password) delete updatedUser.password
-      return updatedUser
-    } else {
-      throw new Error(ErrorTypes.UNAUTHORISED)
+      if (updatedUser.password) delete updatedUser.password;
+      return updatedUser;
     }
+    throw new Error(ErrorTypes.UNAUTHORISED);
   }
 
-  public async deleteUser(params:IDeleteUserParams):Promise<void>{
-    const {id, requestedUserId} = params;
+  public async deleteUser(params:IDeleteUserParams):Promise<void> {
+    const { id, requestedUserId } = params;
     let result:any = null;
-    try{
+    try {
       result = await db.users.destroy(
         {
-          where:{
-            [Op.and]:[{id},{role:{
-              [Op.ne]:UserRole.ADMIN
-            }}]
-          }
-        }
-      )
+          where: {
+            [Op.and]: [{ id }, {
+              role: {
+                [Op.ne]: UserRole.ADMIN,
+              },
+            }],
+          },
+        },
+      );
+    } catch (err:any) {
+      console.error(err.message);
+      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR);
     }
-    catch(err:any){
-      console.error(err.message)
-      throw new Error(ErrorTypes.INTERNAL_SERVER_ERROR)
-    }
-    if(!result) throw new Error(ErrorTypes.UNAUTHORISED)
+    if (!result) throw new Error(ErrorTypes.UNAUTHORISED);
   }
 }

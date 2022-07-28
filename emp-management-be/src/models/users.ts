@@ -1,8 +1,9 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
-import { IUserAttributes,UserRole } from '../types/model';
+import { IUserAttributes, UserRole } from '../types/model';
+
 class Users extends Model<IUserAttributes> {
 }
-module.exports= (sequelize: Sequelize) => {
+module.exports = (sequelize: Sequelize) => {
   Users.init(
     {
       id: {
@@ -12,7 +13,7 @@ module.exports= (sequelize: Sequelize) => {
         validate: {
           isNumeric: true,
         },
-        field:'id'
+        field: 'id',
       },
       name: {
         type: DataTypes.STRING,
@@ -20,7 +21,7 @@ module.exports= (sequelize: Sequelize) => {
         validate: {
           len: [5, 30],
         },
-        field: 'name'
+        field: 'name',
       },
       email: {
         type: DataTypes.STRING,
@@ -28,31 +29,31 @@ module.exports= (sequelize: Sequelize) => {
         validate: {
           isEmail: true,
         },
-        field:'email'
+        field: 'email',
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'password'
+        field: 'password',
       },
       role: {
         type: DataTypes.ENUM(UserRole.DEVELOPER, UserRole.DEVOPS, UserRole.QA, UserRole.ADMIN),
-        field: 'role'
+        field: 'role',
       },
-      age:{
+      age: {
         type: DataTypes.INTEGER,
         field: 'age',
-        allowNull:false,
+        allowNull: false,
       },
-      dateOfJoining:{
+      dateOfJoining: {
         type: DataTypes.DATEONLY,
-        field:'date_of_joining',
-        allowNull:false,
+        field: 'date_of_joining',
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'created_at'
+        field: 'created_at',
       },
       updatedAt: {
         type: DataTypes.DATE,
